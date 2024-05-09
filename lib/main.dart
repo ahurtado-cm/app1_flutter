@@ -137,10 +137,10 @@ class _MyHomePageState extends State<MyHomePage> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             ElevatedButton(onPressed: () {
-              print('pressed');
+              // print('pressed');
               _loadMyVariable();
 
-            }, child: Text('get-env-data')),
+            }, child: const Text('get-env-data')),
             Text('env-value: $myVariable',
             ),
           ],
