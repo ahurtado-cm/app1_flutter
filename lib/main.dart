@@ -1,3 +1,5 @@
+// import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -6,10 +8,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 // }
 
 Future main() async {
+  // print(Directory.current.listSync()); // Print directory contents
+  // Get the absolute path to the .env file
+  // String envFilePath = '${Directory.current.path}/.env';
+  String envFilePath = '.env';
+
   // To load the .env file contents into dotenv.
   // NOTE: fileName defaults to .env and can be omitted in this case.
   // Ensure that the filename corresponds to the path in step 1 and 2.
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: envFilePath);
   //...runapp
   runApp(const MyApp());
 }
@@ -137,10 +144,10 @@ class _MyHomePageState extends State<MyHomePage> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             ElevatedButton(onPressed: () {
-              print('pressed');
+              // print('pressed');
               _loadMyVariable();
 
-            }, child: Text('get-env-data')),
+            }, child: const Text('get-env-data')),
             Text('env-value: $myVariable',
             ),
           ],
