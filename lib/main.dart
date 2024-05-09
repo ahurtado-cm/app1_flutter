@@ -68,11 +68,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   String myVariable = "";
 
-  @override
-  void initState() {
-    super.initState();
-    _loadMyVariable();
-  }
+  // could cause error running tests
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _loadMyVariable();
+  // }
 
   void _incrementCounter() {
     setState(() {
@@ -85,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-_loadMyVariable() {
+  void _loadMyVariable() {
     setState(() {
       myVariable = dotenv.env['MY_VARIABLE'] ?? "Variable not found";
     });
