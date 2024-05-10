@@ -10,9 +10,10 @@ import 'firebase_options.dart';
 // }
 
 Future main() async {
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // print(Directory.current.listSync()); // Print directory contents
   // Get the absolute path to the .env file
   // String envFilePath = '${Directory.current.path}/.env';
@@ -152,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
               // print('pressed');
               _loadMyVariable();
 
-            }, child: const Text('get-env-data')),
+            }, child: const Text('get-env-data (3)')),
             Text('env-value: $myVariable',
             ),
           ],
