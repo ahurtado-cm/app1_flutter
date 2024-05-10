@@ -2,12 +2,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 // void main() {
 //   runApp(const MyApp());
 // }
 
 Future main() async {
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
   // print(Directory.current.listSync()); // Print directory contents
   // Get the absolute path to the .env file
   // String envFilePath = '${Directory.current.path}/.env';
