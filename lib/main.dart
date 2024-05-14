@@ -103,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       myVariable = dotenv.env['MY_VARIABLE'] ?? "Variable not found";
     });
-  }  
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,12 +149,14 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            ElevatedButton(onPressed: () {
-              // print('pressed');
-              _loadMyVariable();
-
-            }, child: const Text('get-env-data (3)')),
-            Text('env-value: $myVariable',
+            ElevatedButton(
+                onPressed: () {
+                  // print('pressed');
+                  _loadMyVariable();
+                },
+                child: const Text('get-env-data (3)')),
+            Text(
+              'env-value: $myVariable',
             ),
           ],
         ),
