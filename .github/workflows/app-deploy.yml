@@ -1,0 +1,18 @@
+name: CI
+on: 
+  pull_request:
+    branches:
+      - main  # develop
+jobs:
+  deploy:
+    uses: ./.github/workflows/run-app-deploy.yml #@ahurtado/feature/STR-623-k3-flutter-ci-flow
+    with:
+      strongline-api-tunneling-url: "http://flutter-app-deploy.ci:9000"
+      app-repository: "ahurtado-cm/app1_flutter"
+      app-repository-ref: 'ahurtado/feature/STR-623-k3-flutter-ci-flow' 
+      working-directory: "app1-flutter"
+      release-tag: "v0.0.1"     
+      release-repository: "ahurtado-cm/app1_flutter"
+    secrets: 
+      PERSONAL_CHECKOUT_TOKEN: ${{secrets.PERSONAL_RELEASE_TOKEN}}
+      PERSONAL_RELEASE_TOKEN: ${{secrets.PERSONAL_RELEASE_TOKEN}}

@@ -1,0 +1,158 @@
+name: Flutter Build and Deploy
+# on: 
+#   workflow_call:
+inputs:
+  strongline-api-tunneling-url:
+    required: true
+    type: string
+# secrets:
+  PERSONAL_CHECKOUT_TOKEN:
+    type: string
+    required: true
+  PERSONAL_RELEASE_TOKEN:
+    type: string
+    required: true
+  app-repository:
+    type: string
+    required: true
+  app-repository-ref:
+    type: string
+    required: true
+  working-directory:
+    type: string
+    required: true
+  release-tag: 
+    type: string
+    required: true
+  release-repository:
+    type: string
+    required: true
+
+# jobs:
+runs:
+  using: "composite"
+
+#  build_app:
+#    name: Flutter build app
+#    # needs: [flutter_test]
+#    runs-on: macos-latest # ubuntu-latest
+  steps: 
+    # 1 Clones the project on the machine
+    - name: Checkout App repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{inputs.app-repository}}
+        token: ${{ inputs.PERSONAL_CHECKOUT_TOKEN }}
+        ref: ${{ inputs.app-repository-ref }}
+        path: ${{ inputs.working-directory }}
+        
+    - name: Create env file
+      run: |
+        pwd
+        ls -Fahl
+        # mkdir -p app1_flutter && cd app1_flutter
+        touch .env
+        echo "MY_VARIABLE=${{inputs.strongline-api-tunneling-url}}" >> .env
+        cat .env
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+        
+    # 3 configure java for building
+    - uses: actions/setup-java@v1
+      with: 
+        java-version: "12.x"
+    # - uses: actions/setup-java@v4
+    #   with: 
+    #     java-version: "21"
+    #     distribution: 'temurin'
+    # - name: Setup Android SDK
+    #   uses: android-actions/setup-android@v3
+
+    # 4 Installs flutter and related dependency on this machine
+    - name: Setup Flutter SDK
+      uses: subosito/flutter-action@v2 #v3 
+      with: 
+        channel: "stable"
+        # version: 3.3.4  # 3.13.0
+    # - run: flutter clean
+    
+    # 5 Fetches proj dependencies from pub
+    - name: Install dependencies
+      run: flutter pub get
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+    
+    # 6 Verifies if the dart code is formatted well
+    - name: Verify formatting
+      run: dart format --output=none --set-exit-if-changed .     
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+      # --set-exit-if-changed stops execution if the any code is not well formatted
+      # --output=none prints files which needs to be formatted
+    
+    # 7 Checks for Semantic errors. Can be configured using analysis_options.yaml
+    - name: Analyze project source
+      run: flutter analyze --fatal-warnings        
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+  
+    # 8 Runs unit test
+    - name: Run tests
+      run: flutter test
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    # For android ............................................................
+
+    # 9 Create android apk
+    - run: flutter build apk --release 
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+    
+    # 10 Create android bundle
+    - run: flutter build appbundle --release 
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+    
+    - name: archive artifact (to github_releases, aab)
+      uses: actions/upload-artifact@master
+      # working-directory: app1_flutter
+      with: 
+        name: APPBUNDLE
+        path: ${{ inputs.working-directory }}/build/app/outputs/bundle/release/app-release.aab
+    # For ios ............................................................
+    - run: flutter build ipa --no-codesign # codesigning instructions at: https://developer.apple.com/library/content/documentation/IDEs/Conceptual/AppDistributionGuide/MaintainingCertificates/MaintainingCertificates.html 
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+    
+    - name: compress archives
+      run: |
+        cd build
+        tar -czf ios_build.tar.gz ios
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+    
+    # package & send to releases
+    - name: archive artifact (to github_releases, iPA) 
+      uses: actions/upload-artifact@master
+      # working-directory: app1_flutter
+      with:
+        name: Releases
+        path: |
+          ${{ inputs.working-directory }}/build/app/outputs/flutter-apk/app-release.apk
+          ${{ inputs.working-directory }}/build/app/outputs/bundle/release/app-release.aab
+          ${{ inputs.working-directory }}/build/ios/iphoneos/Runner.app
+          ${{ inputs.working-directory }}/build/ios_build.tar.gz
+
+
+          
+    - name: relase create / github-releases (android)
+      uses: ncipollo/release-action@v1
+      # working-directory: app1_flutter
+      with: 
+        artifacts: "${{ inputs.working-directory }}/build/app/outputs/flutter-apk/app-release.apk,${{ inputs.working-directory }}/build/app/outputs/bundle/release/app-release.aab,${{ inputs.working-directory }}/build/ios/iphoneos/Runner.app,${{ inputs.working-directory }}/build/ios_build.tar.gz"
+        tag: ${{ inputs.release-tag }} # ${{ github.sha }}
+        token: ${{ inputs.PERSONAL_RELEASE_TOKEN }}
+        allowUpdates: true
+        repo: ${{inputs.release-repository}}  # added (to the app repo; be sure if you have access to create releases in the current repo otherwise)

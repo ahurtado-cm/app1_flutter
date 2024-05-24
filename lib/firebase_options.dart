@@ -71,5 +71,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'strongline-app1-flutter-4dbd6.appspot.com',
     iosBundleId: 'com.example.app1Flutter',
   );
-
 }

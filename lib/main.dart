@@ -10,9 +10,10 @@ import 'firebase_options.dart';
 // }
 
 Future main() async {
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // print(Directory.current.listSync()); // Print directory contents
   // Get the absolute path to the .env file
   // String envFilePath = '${Directory.current.path}/.env';
@@ -102,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       myVariable = dotenv.env['MY_VARIABLE'] ?? "Variable not found";
     });
-  }  
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,12 +149,14 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            ElevatedButton(onPressed: () {
-              // print('pressed');
-              _loadMyVariable();
-
-            }, child: const Text('get-env-data')),
-            Text('env-value: $myVariable',
+            ElevatedButton(
+                onPressed: () {
+                  // print('pressed');
+                  _loadMyVariable();
+                },
+                child: const Text('get-env-data (3)')),
+            Text(
+              'env-value: $myVariable',
             ),
           ],
         ),
